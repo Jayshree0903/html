@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Community Event Portal</title>
+  <style>
+    /* Internal CSS */
+    #welcomeBanner {
+      background-color: #cce5ff;
+      padding: 10px;
+      text-align: center;
+    }
+    .highlight {
+      font-weight: bold;
+      color: darkblue;
+    }
+    .gallery-img {
+      border: 2px solid #333;
+      width: 100px;
+      height: 100px;
+    }
+    form {
+      margin-top: 20px;
+    }
+    #feedback {
+      width: 100%;
+      height: 80px;
+    }
+    .faq {
+      margin: 20px 0;
+    }
+    .faq-item {
+      margin-bottom: 10px;
+    }
+    .faq-item button {
+      background-color: #e7e7e7;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .faq-answer {
+      display: none;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-left: 3px solid #007BFF;
+    }
+  </style>
+  <script>
+    // JavaScript Functions
+    function validatePhone(input) {
+      const phonePattern = /^\d{10}$/;
+      if (!phonePattern.test(input.value)) {
+        alert("Please enter a valid 10-digit phone number.");
+      }
+    }
+
+    function displayFee(select) {
+      const feeOutput = document.getElementById("feeOutput");
+      const fees = { music: 100, art: 80, tech: 150, handicraft: 70, book: 60, food: 120 };
+      feeOutput.textContent = `Fee: $${fees[select.value] || 0}`;
+    }
+
+    function showConfirmation() {
+      document.getElementById("formConfirmation").value = "Registration successful!";
+    }
+
+    function enlargeImage(img) {
+      img.style.width = "200px";
+      img.style.height = "200px";
+    }
+
+    function countCharacters(textarea) {
+      const charCount = document.getElementById("charCount");
+      charCount.textContent = `Characters: ${textarea.value.length}`;
+    }
+
+    function videoReady() {
+      alert("Video ready to play");
+    }
+
+    window.onbeforeunload = function() {
+      return "You have unsaved changes. Are you sure you want to leave?";
+    };
+
+    function savePreference() {
+      const type = document.getElementById("eventType").value;
+      localStorage.setItem("preferredEvent", type);
+    }
+
+    function loadPreference() {
+      const pref = localStorage.getItem("preferredEvent");
+      if (pref) {
+        document.getElementById("eventType").value = pref;
+        displayFee({ value: pref });
+      }
+    }
+
+    function clearPreferences() {
+      localStorage.clear();
+      sessionStorage.clear();
+      alert("Preferences cleared.");
+    }
+
+    function findNearby() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError, {
+          enableHighAccuracy: true,
+          timeout: 5000
+        });
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+
+    function showPosition(position) {
+      document.getElementById("location").textContent =
+        `Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`;
+    }
+
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied the request for Geolocation.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.");
+          break;
+        default:
+          alert("An unknown error occurred.");
+          break;
+      }
+    }
+
+    function toggleAnswer(id) {
+      const answer = document.getElementById(id);
+      answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+    }
+  </script>
+</head>
+<body onload="loadPreference()">
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#home">Home</a> |
+    <a href="#events">Events</a> |
+    <a href="#contact">Contact</a> |
+    <a href="help.html" target="_blank">Help</a>
+  </nav>
+
+  <!-- Main -->
+  <main>
+    <section id="home">
+      <div id="welcomeBanner">
+        <h1>Welcome to the Community Portal!</h1>
+        <p><span style="color: red; font-weight: bold;">Special Offer:</span> Free entry to first 100 registrants!</p>
+      </div>
+    </section>
+
+    <section id="events">
+      <h2 class="highlight">Community Events Gallery</h2>
+      <table>
+        <caption>Recent Events</caption>
+       <tr>
+          <td><img src="music-festival-crowd.jpg" class="gallery-img" alt="Event 1" title="Music Fest" ondblclick="enlargeImage(this)"></td>
+          <td><img src="local-art-display.jpg" class="gallery-img" alt="Event 2" title="Art Expo" ondblclick="enlargeImage(this)"></td>
+          <td><img src="downloadtech-seminar-speaker.jpg" class="gallery-img" alt="Event 3" title="Tech Talk" ondblclick="enlargeImage(this)"></td>
+        </tr>
+        <tr>
+          <td><img src="handicraft-stalls.jpg" class="gallery-img" alt="Event 4" title="Craft Fair" ondblclick="enlargeImage(this)"></td>
+          <td><img src="food-festival-table.jpg" class="gallery-img" alt="Event 5" title="Food Fest" ondblclick="enlargeImage(this)"></td>
+          <td><img src="book-reading-session.jpg" class="gallery-img" alt="Event 6" title="Book Reading" ondblclick="enlargeImage(this)"></td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="contact">
+      <h2 class="highlight">Register for an Event</h2>
+      <form onsubmit="showConfirmation(); return false;">
+        <label>Name: <input type="text" placeholder="Your name" required autofocus></label><br>
+        <label>Email: <input type="email" placeholder="Your email" required></label><br>
+        <label>Date: <input type="date" required></label><br>
+        <label>Phone: <input type="text" onblur="validatePhone(this)"></label><br>
+        <label>Event Type: 
+          <select id="eventType" onchange="displayFee(this); savePreference();">
+            <option value="">Select</option>
+            <option value="music">Music</option>
+            <option value="art">Art</option>
+            <option value="tech">Tech</option>
+            <option value="handicraft">Handicraft Stall</option>
+            <option value="book">Book Reading</option>
+            <option value="food">Food Fest</option>
+          </select>
+        </label><br>
+        <div id="feeOutput">Fee: $0</div>
+        <label>Message: <textarea id="feedback" onkeyup="countCharacters(this)"></textarea></label><br>
+        <div id="charCount">Characters: 0</div>
+        <button type="submit">Submit</button>
+        <button type="button" onclick="clearPreferences()">Clear Preferences</button><br>
+        <output id="formConfirmation"></output>
+      </form>
+    </section>
+
+    <section>
+      <h2 class="highlight">Event Promo Video</h2>
+      <video width="320" height="240" controls oncanplay="videoReady()">
+        <source src="promo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </section>
+
+    <section>
+      <h2 class="highlight">Find Nearby Events</h2>
+      <button onclick="findNearby()">Find Nearby Events</button>
+      <p id="location"></p>
+    </section>
+
+    <section class="faq">
+      <h2 class="highlight">Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <button onclick="toggleAnswer('faq1')">What types of events are available?</button>
+        <div id="faq1" class="faq-answer">We host music concerts, art exhibitions, tech talks, and more.</div>
+      </div>
+      <div class="faq-item">
+        <button onclick="toggleAnswer('faq2')">How can I register for an event?</button>
+        <div id="faq2" class="faq-answer">Fill out the registration form in the 'Register for an Event' section.</div>
+      </div>
+      <div class="faq-item">
+        <button onclick="toggleAnswer('faq3')">Is there an entry fee?</button>
+        <div id="faq3" class="faq-answer">Yes, fees vary by event type. See the dropdown in the registration form.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Local Community Council. All rights reserved.</p>
+  </footer>
+</body>
+</html>
